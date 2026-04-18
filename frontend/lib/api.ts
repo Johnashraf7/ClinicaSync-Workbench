@@ -12,6 +12,9 @@ export interface DrugCandidate {
   name: string;
   score: number;
   shared_genes: string[];
+  moa_table: { action_type: string, mechanism_of_action: string, target_chembl_id: string }[];
+  clinical_stage: string;
+  validation_status: "Confirmed" | "Predicted";
 }
 
 export const searchDisease = async (query: string): Promise<SearchResult[]> => {

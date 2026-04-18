@@ -1,34 +1,34 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  --bg-color: #F6F8FA;
-  --bg-gradient: linear-gradient(145deg, #F6F8FA, #FFFFFF);
-  --card-bg: rgba(255, 255, 255, 0.95);
+  --bg-color: #050914;
+  --bg-gradient: radial-gradient(circle at top, #0A1128, #03050B 100%);
+  --card-bg: rgba(13, 20, 38, 0.6);
   
-  --text-main: #1A202C;
-  --text-muted: #4A5568;
-  --text-subtle: #A0AEC0;
+  --text-main: #FFFFFF;
+  --text-muted: #94A3B8;
+  --text-subtle: #475569;
   
-  --primary: #0052CC; /* Medical Bioscience Blue */
-  --primary-hover: #0747A6;
-  --primary-light: #DEEBFF;
+  --primary: #00E5FF; /* Cyan glow */
+  --primary-hover: #00B1CC;
+  --primary-subtle: rgba(0, 229, 255, 0.15);
   
-  --accent: #00B8D9;
-  --accent-light: #E6FCFF;
+  --accent: #2563EB; /* Deep neon blue */
+  --accent-light: #60A5FA;
   
-  --border: #EDF2F7;
-  --border-focus: #2684FF;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(0, 229, 255, 0.5);
   
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  --shadow-hover: 0 12px 24px rgba(0, 0, 0, 0.08);
-  --shadow-glow: 0 4px 20px rgba(0, 82, 204, 0.15);
+  --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 229, 255, 0.2);
+  --shadow-glow: 0 0 20px rgba(0, 229, 255, 0.3);
   
-  --radius: 12px;
-  --radius-lg: 20px;
+  --radius: 16px;
+  --radius-lg: 24px;
   --radius-pill: 9999px;
   
-  --transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 * {
@@ -38,112 +38,121 @@
 }
 
 body {
-  background: var(--bg-gradient);
+  background: var(--bg-color);
+  background-image: var(--bg-gradient);
   background-attachment: fixed;
   color: var(--text-main);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
 }
 
 /* Typography */
-h1 { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.05em; color: var(--text-main); }
-h2 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
-h3 { font-size: 1.25rem; font-weight: 600; }
-p { font-size: 1rem; color: var(--text-muted); }
+h1 { font-size: 3.5rem; font-weight: 800; letter-spacing: -0.02em; 
+     background: linear-gradient(135deg, #FFFFFF, var(--primary)); 
+     -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+h2 { font-size: 1.8rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+h3 { font-size: 1.3rem; font-weight: 500; color: #E2E8F0; }
+p { font-size: 1.05rem; color: var(--text-muted); }
 
 /* Layout & Elements */
 .container {
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 3rem 1.5rem;
 }
 
 .header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 3rem;
+  gap: 16px;
+  margin-bottom: 4rem;
 }
 
 .logo-text {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary);
+  font-size: 2rem;
+  font-weight: 800;
   letter-spacing: -0.03em;
 }
 
 /* Search Bar */
 .search-container {
   position: relative;
-  max-width: 600px;
-  margin: 0 auto 3rem auto;
+  max-width: 700px;
+  margin: 0 auto 4rem auto;
   display: flex;
+  transform: translateY(0);
+  transition: var(--transition);
 }
 
 .search-input {
   width: 100%;
-  padding: 1.2rem 1.5rem;
-  padding-left: 3.5rem;
-  font-size: 1.125rem;
-  border: 2px solid var(--border);
+  padding: 1.4rem 1.5rem;
+  padding-left: 4rem;
+  font-size: 1.25rem;
+  border: 1px solid var(--border);
   border-radius: var(--radius-pill);
-  background: var(--card-bg);
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   box-shadow: var(--shadow);
   transition: var(--transition);
   color: var(--text-main);
   outline: none;
 }
 
+.search-input::placeholder { color: var(--text-subtle); }
+
 .search-input:focus {
   border-color: var(--border-focus);
   box-shadow: var(--shadow-glow);
+  background: rgba(15, 23, 42, 0.8);
 }
 
 .search-icon {
   position: absolute;
-  left: 1.25rem;
+  left: 1.5rem;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--text-muted);
-  width: 24px;
-  height: 24px;
+  color: var(--primary);
+  width: 28px;
+  height: 28px;
 }
 
 .search-btn {
   position: absolute;
-  right: 0.5rem;
-  top: 0.5rem;
-  bottom: 0.5rem;
-  padding: 0 1.5rem;
-  background-color: var(--primary);
-  color: white;
+  right: 0.6rem;
+  top: 0.6rem;
+  bottom: 0.6rem;
+  padding: 0 2rem;
+  background: linear-gradient(135deg, var(--accent), var(--primary));
+  color: #000;
   border-radius: var(--radius-pill);
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 1.1rem;
   transition: var(--transition);
   border: none;
   cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3);
 }
 
 .search-btn:hover {
-  background-color: var(--primary-hover);
-  transform: scale(1.02);
-}
-
-.search-btn:active {
-  transform: scale(0.98);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 229, 255, 0.5);
+  color: #FFF;
 }
 
 .search-btn:disabled {
-  background-color: var(--text-subtle);
+  background: var(--text-subtle);
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 /* Results Area */
 .results-header {
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border);
 }
@@ -158,19 +167,32 @@ p { font-size: 1rem; color: var(--text-muted); }
 .drug-card {
   background: var(--card-bg);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  padding: 1.8rem;
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transition: var(--transition);
   position: relative;
   overflow: hidden;
 }
 
+.drug-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
 .drug-card:hover {
   box-shadow: var(--shadow-hover);
-  border-color: var(--primary-light);
-  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.15);
+  transform: translateY(-4px);
 }
+
+.drug-card:hover::before { opacity: 1; }
 
 .card-header {
   display: flex;
@@ -179,81 +201,93 @@ p { font-size: 1rem; color: var(--text-muted); }
 }
 
 .drug-name {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #FFF;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
+.drug-name svg { color: var(--primary); }
+
 .drug-score {
-  background: var(--primary-light);
+  background: var(--primary-subtle);
   color: var(--primary);
-  padding: 0.25rem 0.75rem;
+  padding: 0.3rem 1rem;
   border-radius: var(--radius-pill);
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: 1px solid rgba(0,229,255,0.2);
 }
 
 .genes-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
 }
 
 .gene-tag {
-  background: var(--bg-color);
+  background: rgba(255,255,255,0.05);
   color: var(--text-muted);
-  border: 1px solid var(--border);
-  padding: 0.25rem 0.75rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
   font-family: monospace;
+  transition: var(--transition);
+}
+
+.gene-tag:hover {
+  background: var(--primary-subtle);
+  color: var(--primary);
+  border-color: rgba(0,229,255,0.3);
 }
 
 /* Explanation Expansion */
 .explain-btn {
-  margin-top: 1.5rem;
+  margin-top: 1.8rem;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: var(--primary);
-  font-weight: 500;
-  font-size: 0.9rem;
+  font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
-  background: none;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 8px;
+  background: rgba(0,229,255,0.05);
+  border: 1px solid rgba(0,229,255,0.2);
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
   transition: var(--transition);
   width: 100%;
 }
 
 .explain-btn:hover {
-  background: var(--primary-light);
+  background: var(--primary-subtle);
+  box-shadow: 0 0 15px rgba(0,229,255,0.2);
 }
 
 .explanation-box {
-  margin-top: 1rem;
-  padding: 1rem;
-  background: var(--bg-color);
+  margin-top: 1.2rem;
+  padding: 1.5rem;
+  background: rgba(0,0,0,0.3);
   border-radius: var(--radius);
   border-left: 4px solid var(--primary);
-  font-size: 0.95rem;
-  color: var(--text-main);
-  animation: fadeIn 0.3s ease-out;
+  font-size: 1.05rem;
+  color: #E2E8F0;
+  animation: fadeIn 0.4s ease-out;
+  line-height: 1.7;
 }
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .spinner {
-  border: 3px solid rgba(0, 0, 0, 0.1);
+  border: 3px solid rgba(255, 255, 255, 0.1);
   width: 24px;
   height: 24px;
   border-radius: 50%;
@@ -274,5 +308,5 @@ p { font-size: 1rem; color: var(--text-muted); }
 .mb-2 { margin-bottom: 0.5rem; }
 .mb-4 { margin-bottom: 1rem; }
 .flex-center { display: flex; align-items: center; justify-content: center; }
-.error-msg { background: #FEE2E2; color: #B91C1C; padding: 1rem; border-radius: var(--radius); text-align: center; }
-.empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
+.error-msg { background: rgba(239, 68, 68, 0.1); color: #FCA5A5; padding: 1.2rem; border-radius: var(--radius); text-align: center; border: 1px border rgba(239,68,68,0.3); }
+.empty-state { text-align: center; padding: 5rem 2rem; color: var(--text-muted); background: rgba(255,255,255,0.02); border-radius: var(--radius-lg); border: 1px dashed var(--border); }

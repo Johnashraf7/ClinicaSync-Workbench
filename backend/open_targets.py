@@ -62,15 +62,77 @@ def get_targets_for_disease(efo_id: str, size: int = 50):
         print(f"Error fetching targets: {e}")
         return []
 
-def get_drugs_for_targets(ensembl_ids: list[str]):
+from typing import List
+def get_drugs_for_targets_by_symbol(symbols: List[str]):
     query_str = """
-    query targetsDrugs($ensemblIds: [String!]!) {
-      targets(ensemblIds: $ensemblIds) {
+    query searchDrugs($qs: String!) {
+      search(queryString: $qs, entityNames: ["drug"], page: {index: 0, size: 15}) {
+        hits {
+          id
+          name
+        }
+      }
+    }
+    """
+    result = {}
+    for symbol in symbols:
+        try:
+            response = requests.post(GRAPHQL_URL, json={"query": query_str, "variables": {"qs": symbol}}, timeout=5)
+            data = response.json()
+            hits = data.get("data", {}).get("search", {}).get("hits", [])
+            for hit in hits:
+                d_id = hit["id"]
+                if d_id not in result:
+                    result[d_id] = {"name": hit["name"], "targets": set()}
+                result[d_id]["targets"].add(symbol)
+        except Exception as e:
+            print(f"Error fetching drugs for {symbol}:", e)
+            continue
+    return result
+
+def batch_get_drug_moa(chembl_ids: List[str]):
+    query_str = """
+    query getMoA($chemblIds: [String!]!) {
+      drugs(chemblIds: $chemblIds) {
         id
-        approvedSymbol
-        knownDrugs(page: {size: 100}) {
+        mechanismsOfAction {
           rows {
-            drug {
+            actionType
+            targets { approvedSymbol }
+          }
+        }
+      }
+    }
+    """
+    try:
+        response = requests.post(GRAPHQL_URL, json={"query": query_str, "variables": {"chemblIds": chembl_ids}}, timeout=15)
+        data = response.json()
+        drugs_data = data.get("data", {}).get("drugs", [])
+        moa_dict = {}
+        for drug in drugs_data:
+            d_id = drug["id"]
+            moa_dict[d_id] = {}
+            rows = drug.get("mechanismsOfAction", {}).get("rows", [])
+            for row in rows:
+                action = row.get("actionType")
+                for target in row.get("targets", []):
+                    symbol = target.get("approvedSymbol")
+                    if symbol and action:
+                        moa_dict[d_id][symbol] = action
+        return moa_dict
+    except Exception as e:
+        print(f"Error fetching MoA: {e}")
+        return {}
+
+def batch_get_clinical_info(chembl_ids: List[str]):
+    query_str = """
+    query getClinical($chemblIds: [String!]!) {
+      drugs(chemblIds: $chemblIds) {
+        id
+        maximumClinicalStage
+        indications {
+          rows {
+            disease {
               id
               name
             }
@@ -79,30 +141,18 @@ def get_drugs_for_targets(ensembl_ids: list[str]):
       }
     }
     """
-    # Note: GraphQL limits might apply if we send 50 IDs and each has many drugs.
-    # The platform API usually handles this well, but we'll monitor.
-    variables = {"ensemblIds": ensembl_ids}
     try:
-        response = requests.post(GRAPHQL_URL, json={"query": query_str, "variables": variables}, timeout=20)
+        response = requests.post(GRAPHQL_URL, json={"query": query_str, "variables": {"chemblIds": chembl_ids}}, timeout=15)
         data = response.json()
-        targets_data = data.get("data", {}).get("targets", [])
-        
-        result = {}
-        for target in targets_data:
-            symbol = target["approvedSymbol"]
-            drugs = target.get("knownDrugs", {}).get("rows", [])
-            for row in drugs:
-                d = row["drug"]
-                drug_id = d["id"]
-                drug_name = d["name"]
-                if drug_id not in result:
-                    result[drug_id] = {
-                        "name": drug_name,
-                        "targets": set()
-                    }
-                result[drug_id]["targets"].add(symbol)
-                
-        return result
+        drugs_data = data.get("data", {}).get("drugs", [])
+        clinical_dict = {}
+        for drug in drugs_data:
+            d_id = drug["id"]
+            clinical_dict[d_id] = {
+                "max_stage": drug.get("maximumClinicalStage"),
+                "indications": [row["disease"]["id"] for row in drug.get("indications", {}).get("rows", [])]
+            }
+        return clinical_dict
     except Exception as e:
-        print(f"Error fetching drugs: {e}")
+        print(f"Error fetching Clinical Info: {e}")
         return {}

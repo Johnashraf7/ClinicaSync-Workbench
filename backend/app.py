@@ -16,10 +16,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from typing import List
+
 class ExplainRequest(BaseModel):
     drug: str
     disease: str
-    genes: list[str]
+    genes: List[str]
 
 @app.get("/")
 def read_root():
@@ -37,10 +39,10 @@ def predict_repurposing(disease_id: str, disease_name: str):
     if not targets:
         raise HTTPException(status_code=404, detail="No targets found for this disease")
     
-    target_ids = [t["id"] for t in targets]
+    target_symbols = [t["symbol"] for t in targets][:25] # Limit to 25 to prevent timeout
     
     # 2. Get drugs
-    drugs_dict = open_targets.get_drugs_for_targets(target_ids)
+    drugs_dict = open_targets.get_drugs_for_targets_by_symbol(target_symbols)
     if not drugs_dict:
         raise HTTPException(status_code=404, detail="No interacting drugs found")
         
@@ -74,21 +76,22 @@ def predict_repurposing(disease_id: str, disease_name: str):
             score = 0.0
             shared_genes = []
             
-            # neighbors of drug are genes
             for neighbor in G.neighbors(node):
                 if G.nodes[neighbor].get("type") == "gene":
-                    # add the weight of the gene-disease edge
                     if G.has_edge(disease_name, neighbor):
                         edge_data = G.get_edge_data(disease_name, neighbor)
                         weight = edge_data.get("weight", 0.0)
                         score += weight
                         shared_genes.append(neighbor)
                         
-            if score > 0:
+            overlap_count = len(shared_genes)
+            if overlap_count > 0:
+                comprehensive_score = score * (overlap_count ** 0.5)
+
                 drug_scores.append({
                     "id": data.get("id"),
                     "name": node,
-                    "score": round(score, 4),
+                    "score": round(comprehensive_score, 4),
                     "shared_genes": shared_genes
                 })
                 
@@ -96,6 +99,30 @@ def predict_repurposing(disease_id: str, disease_name: str):
     drug_scores.sort(key=lambda x: x["score"], reverse=True)
     top_candidates = drug_scores[:20]
     
+    # 5. Connect ChEMBL API for Tables
+    import chembl_api 
+    top_chembl_ids = [c["id"] for c in top_candidates]
+    moa_tables = chembl_api.get_mechanisms_for_drugs(top_chembl_ids)
+    
+    # 6. Fetch Clinical Trial Data & Compute Validation Layer
+    clinical_info = open_targets.batch_get_clinical_info(top_chembl_ids)
+    
+    for candidate in top_candidates:
+        d_id = candidate["id"]
+        # MoA Table
+        candidate["moa_table"] = moa_tables.get(d_id, [])
+        
+        # Clinical & Validation Data
+        c_data = clinical_info.get(d_id, {"max_stage": "Experimental", "indications": []})
+        candidate["clinical_stage"] = c_data.get("max_stage") or "N/A"
+        
+        # Validation Logic: Is it already linked to this disease?
+        # We check both exact ID and name-based heuristic if possible
+        is_validated = disease_id in c_data.get("indications", [])
+        
+        # In case EFO IDs are different (e.g. MONDO vs EFO), we can offer a 'Confirmed' status
+        candidate["validation_status"] = "Confirmed" if is_validated else "Predicted"
+            
     return {
         "disease": disease_name,
         "disease_id": disease_id,

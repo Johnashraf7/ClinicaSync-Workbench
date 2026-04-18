@@ -1,8 +1,9 @@
 "use client";
 import React, { useState } from 'react';
-import { Search, ArrowRight, Activity, Cpu } from 'lucide-react';
+import { Search, ArrowRight, Activity, Cpu, Network } from 'lucide-react';
 import { searchDisease, predictRepurposing, SearchResult, DrugCandidate } from '../lib/api';
 import DrugCard from '../components/DrugCard';
+import MethodologySection from '../components/MethodologySection';
 
 export default function Home() {
   const [query, setQuery] = useState('');
@@ -54,15 +55,65 @@ export default function Home() {
 
   return (
     <main className="container">
-      <header className="header" style={{ justifyContent: 'center', marginTop: '2rem' }}>
-        <img src="/logo.png" alt="Logo" style={{height: 48}} />
-        <h1 className="logo-text">TheraMatch Engine</h1>
+      <header className="header" style={{ justifyContent: 'center', marginTop: '2rem', flexDirection: 'column', gap: '15px', alignItems: 'center' }}>
+        <style dangerouslySetInnerHTML={{ __html: `
+          @keyframes logoPulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.4)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 25px rgba(0, 229, 255, 0.6)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.4)); }
+          }
+          .dynamic-logo-img {
+            animation: logoPulse 4s infinite ease-in-out;
+          }
+        `}} />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+           <img 
+             src="/molecular_logo.png" 
+             alt="TheraMatch Geometric Molecule" 
+             className="dynamic-logo-img"
+             style={{ 
+               height: '140px', 
+               objectFit: 'contain', 
+               mixBlendMode: 'screen',
+             }} 
+           />
+           <h1 className="logo-text" style={{ 
+             fontSize: '4.5rem', 
+             fontWeight: '900', 
+             letterSpacing: '-4px',
+             margin: '10px 0 0 0',
+             background: 'linear-gradient(to bottom, #FFFFFF, #E2E8F0)',
+             WebkitBackgroundClip: 'text',
+             WebkitTextFillColor: 'transparent',
+             textShadow: '0 0 40px rgba(0, 229, 255, 0.2)'
+           }}>
+             TheraMatch
+           </h1>
+           <div style={{ 
+             fontSize: '0.9rem', 
+             color: '#00E5FF', 
+             textTransform: 'uppercase', 
+             letterSpacing: '8px', 
+             marginTop: '0px',
+             background: 'rgba(0, 229, 255, 0.1)',
+             padding: '4px 16px',
+             borderRadius: '20px',
+             border: '1px solid rgba(0, 229, 255, 0.2)',
+             fontWeight: '800'
+           }}>
+             Analytical Engine
+           </div>
+        </div>
       </header>
+
+
 
       <div className="text-center mb-4">
         <h2>Computational Drug Repurposing</h2>
         <p>Identify new therapeutic uses for existing drugs via Knowledge Graph Analysis & AI</p>
       </div>
+
+
 
       <form onSubmit={handleSearch} className="search-container">
         <Search className="search-icon" />
@@ -110,7 +161,10 @@ export default function Home() {
         <div className="mt-8">
           <div className="results-header">
             <h2>Candidates for {selectedDisease.name}</h2>
-            <p>Ranked by target proximity score via Open Targets Genetics API</p>
+            <p style={{marginBottom: "1rem"}}>Ranked by target proximity score via Open Targets Genomics API</p>
+            <div className="score-clarification" style={{ background: 'rgba(0, 229, 255, 0.05)', border: '1px solid rgba(0, 229, 255, 0.2)', padding: '1rem', borderRadius: '12px', fontSize: '0.95rem' }}>
+              <strong style={{color: 'var(--primary)'}}>★ Score Clarification:</strong> This score is the cumulative genetic & pathway evidence (from DisGeNET/Open Targets) of all genes successfully targeted by this drug. A higher score equates to a stronger probability of the drug interrupting disease pathways.
+            </div>
           </div>
           
           <div className="results-grid">
@@ -122,11 +176,14 @@ export default function Home() {
       )}
 
       {!searching && !processing && results.length === 0 && candidates.length === 0 && !error && (
-        <div className="empty-state">
-          <Network size={48} color="var(--text-subtle)" style={{margin: '0 auto', marginBottom: '1rem'}} />
-          <h3>Awaiting Query</h3>
-          <p>Enter a disease above to construct the biomedical graph.</p>
-        </div>
+        <>
+          <div className="empty-state" style={{ marginBottom: '4rem' }}>
+            <Network size={48} color="var(--text-subtle)" style={{margin: '0 auto', marginBottom: '1rem'}} />
+            <h3>Awaiting Query</h3>
+            <p>Enter a disease above to construct the biomedical graph.</p>
+          </div>
+          <MethodologySection />
+        </>
       )}
     </main>
   );
