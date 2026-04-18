@@ -1,0 +1,21 @@
+name: Sync to Hugging Face Hub
+on:
+  push:
+    branches: [backend-deploy]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to Hugging Face
+        uses: huggingface/hub-sync@v1.0
+        with:
+          github_repo_id: Johnashraf7/TheraMatch-Workbench
+          huggingface_repo_id: johniskros/TheraMatch
+          repo_type: space
+          hf_token: ${{ secrets.HF_TOKEN }}
